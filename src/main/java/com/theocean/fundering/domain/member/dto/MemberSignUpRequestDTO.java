@@ -5,13 +5,15 @@ import com.theocean.fundering.domain.member.domain.constant.UserRole;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@AllArgsConstructor
-@RequiredArgsConstructor
-public class MemberRequestDTO {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)// 테스트 에러 방지
+@NoArgsConstructor(access = AccessLevel.PRIVATE)// 테스트 에러 방지
+public class MemberSignUpRequestDTO {
     @NotEmpty
     @Pattern(regexp = "^[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$", message = "이메일 형식으로 작성해주세요")
     private String email;
@@ -25,14 +27,11 @@ public class MemberRequestDTO {
     @NotEmpty
     private String nickname;
 
-    public static MemberRequestDTO from(Member member){
-        return MemberRequestDTO.builder()
-                .email(member.getEmail())
-                .nickname(member.getNickname())
-                .password(member.getPassword())
-                .build();
+    public static MemberSignUpRequestDTO of(final String email, final String password, final String nickname){
+        return new MemberSignUpRequestDTO(email, password, nickname);
     }
-    public Member getEntity(){
+
+    public Member mapToEntity(){
         return Member.builder()
                 .email(email)
                 .nickname(nickname)
@@ -40,8 +39,8 @@ public class MemberRequestDTO {
                 .userRole(UserRole.USER)
                 .build();
     }
-    public void encodePassword(String encodePassword){
-        this.password = encodePassword;
+    public void encodePassword(final String encodePassword){
+        password = encodePassword;
     }
 
 }

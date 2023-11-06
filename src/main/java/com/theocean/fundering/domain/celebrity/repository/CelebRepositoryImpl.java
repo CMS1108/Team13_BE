@@ -3,6 +3,7 @@ package com.theocean.fundering.domain.celebrity.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.theocean.fundering.domain.celebrity.domain.constant.ApprovalStatus;
 import com.theocean.fundering.domain.celebrity.dto.CelebFundingResponseDTO;
 import com.theocean.fundering.domain.celebrity.dto.CelebListResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<CelebFundingResponseDTO> findAllPosting(final Long celebId, final Long postId, final Pageable pageable) {
+    public Slice<CelebFundingResponseDTO> findAllPosting(final Long celebId, final Pageable pageable) {
         Objects.requireNonNull(celebId, "celebId must not be null");
         final List<CelebFundingResponseDTO> contents = queryFactory
                 .select(Projections.constructor(CelebFundingResponseDTO.class,
@@ -37,13 +38,14 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
                         post.participants,
                         post.targetPrice))
                 .from(post)
-                .where(eqPostCelebId(celebId), ltPostId(postId))
+                .where(eqPostCelebId(celebId), eqCelebApprovalStatus())
                 .orderBy(post.postId.desc())
                 .limit(pageable.getPageSize())
                 .fetch();
         final boolean hasNext = contents.size() > pageable.getPageSize();
         return new SliceImpl<>(contents, pageable, hasNext);
     }
+
 
     @Override
     public Slice<CelebListResponseDTO> findAllCeleb(final Long celebId, final String keyword, final Pageable pageable) {
@@ -53,11 +55,11 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
                         celebrity.celebId,
                         celebrity.celebName,
                         celebrity.celebGender,
-                        celebrity.celebType,
+                        celebrity.celebCategory,
                         celebrity.celebGroup,
                         celebrity.profileImage))
                 .from(celebrity)
-                .where(ltCelebId(celebId), nameCondition(keyword).or(groupCondition(keyword)))
+                .where(ltCelebId(celebId), eqCelebApprovalStatus(), nameCondition(keyword).or(groupCondition(keyword)))
                 .orderBy(celebrity.celebId.desc())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -65,12 +67,36 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
         return new SliceImpl<>(contents, pageable, hasNext);
     }
 
-    private BooleanExpression eqPostCelebId(final Long celebId){
-        return post.celebrity.celebId.eq(celebId);
+    @Override
+    public Slice<CelebListResponseDTO> findAllCelebForApproval(Long celebId, Pageable pageable) {
+        Objects.requireNonNull(celebId, "celebId must not be null");
+        final List<CelebListResponseDTO> contents = queryFactory
+                .select(Projections.constructor(CelebListResponseDTO.class,
+                        celebrity.celebId,
+                        celebrity.celebName,
+                        celebrity.celebGender,
+                        celebrity.celebCategory,
+                        celebrity.celebGroup,
+                        celebrity.profileImage))
+                .from(celebrity)
+                .where(ltCelebId(celebId), eqCelebPendingStatus())
+                .orderBy(celebrity.celebId.desc())
+                .limit(pageable.getPageSize())
+                .fetch();
+        final boolean hasNext = contents.size() > pageable.getPageSize();
+        return new SliceImpl<>(contents, pageable, hasNext);
     }
 
-    private BooleanExpression ltPostId(final Long cursorId){
-        return cursorId != null ? post.postId.lt(cursorId) : null;
+    private BooleanExpression eqCelebApprovalStatus() {
+        return celebrity.status.eq(ApprovalStatus.APPROVED);
+    }
+
+    private BooleanExpression eqCelebPendingStatus() {
+        return celebrity.status.eq(ApprovalStatus.PENDING);
+    }
+
+    private BooleanExpression eqPostCelebId(final Long celebId){
+        return post.celebrity.celebId.eq(celebId);
     }
 
     private BooleanExpression ltCelebId(final Long cursorId){

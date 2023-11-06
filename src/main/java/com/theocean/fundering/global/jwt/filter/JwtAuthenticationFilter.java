@@ -1,16 +1,16 @@
 package com.theocean.fundering.global.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theocean.fundering.domain.member.repository.MemberRepository;
 import com.theocean.fundering.domain.member.domain.Member;
+import com.theocean.fundering.domain.member.repository.MemberRepository;
 import com.theocean.fundering.global.errors.exception.Exception403;
 import com.theocean.fundering.global.jwt.JwtProvider;
+import com.theocean.fundering.global.jwt.userInfo.CustomUserDetails;
 import com.theocean.fundering.global.utils.PasswordUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -46,7 +47,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
         }
 
         final String refreshToken = jwtProvider.extractRefreshToken(request).orElse(null);
-        try{
+        try {
             // 원래 리소스 접근 시 refreshToken 없고 accessToken만 존재
             // accessToken 으로 이메일 비교 후 성공하면 인증 성공, 실패하면 다음 필터에서 인증 오류
             if (null == refreshToken) {
@@ -58,7 +59,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
                 checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
             }
             // 두 토큰 다 실패하면 다음 필터에서 403 에러
-        }catch(final Exception e){
+        } catch (final Exception e) {
             forbidden(response, new Exception403("권한이 없습니다."));
         }
     }
@@ -98,15 +99,20 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
             password = PasswordUtil.generateRandomPassword();
         }
 
-        final UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
+        final UserDetails userDetailsUser = User.builder()
                 .username(myUser.getEmail())
                 .password(password)
                 .roles(myUser.getUserRole().getType())
                 .build();
 
+        final UserDetails customUserDetailsUser = CustomUserDetails.from(myUser);
+
         final Authentication authentication =
-                new UsernamePasswordAuthenticationToken(userDetailsUser, null,
-                        authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
+                new UsernamePasswordAuthenticationToken(
+                        customUserDetailsUser,
+                        customUserDetailsUser.getPassword(),
+                        userDetailsUser.getAuthorities()
+                );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

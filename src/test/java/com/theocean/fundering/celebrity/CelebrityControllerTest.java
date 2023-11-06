@@ -3,33 +3,28 @@ package com.theocean.fundering.celebrity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theocean.fundering.domain.celebrity.controller.CelebController;
 import com.theocean.fundering.domain.celebrity.domain.Celebrity;
+import com.theocean.fundering.domain.celebrity.domain.constant.CelebCategory;
 import com.theocean.fundering.domain.celebrity.domain.constant.CelebGender;
-import com.theocean.fundering.domain.celebrity.domain.constant.CelebType;
 import com.theocean.fundering.domain.celebrity.dto.CelebRequestDTO;
 import com.theocean.fundering.domain.celebrity.service.CelebService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.mockito.BDDMockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
 @WebMvcTest(CelebController.class)
-@MockBean(JpaMetamodelMappingContext.class)
 @ImportAutoConfiguration(exclude = OAuth2ClientAutoConfiguration.class)
 class CelebrityControllerTest {
     private static final String CELEB_NAME = "아이유";
@@ -47,7 +42,7 @@ class CelebrityControllerTest {
     private final Celebrity celeb = Celebrity.builder()
             .celebName(CELEB_NAME)
             .celebGender(CelebGender.FEMALE)
-            .celebType(CelebType.SINGER)
+            .celebCategory(CelebCategory.SINGER)
             .profileImage(PROFILE_IMAGE)
             .build();
 
@@ -58,8 +53,7 @@ class CelebrityControllerTest {
         final CelebRequestDTO requestDTO = CelebRequestDTO.builder()
                 .celebName(celeb.getCelebName())
                 .celebGender(celeb.getCelebGender())
-                .celebType(celeb.getCelebType())
-                .profileImage(celeb.getProfileImage())
+                .celebCategory(celeb.getCelebCategory())
                 .build();
         final String requestBody = om.writeValueAsString(requestDTO);
 
