@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "CELEB", description = "celeb 관련 API")
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api")
 public class CelebController {
     private final CelebService celebService;
 
@@ -102,8 +103,8 @@ public class CelebController {
     @GetMapping("/celebs")
     @ResponseStatus(HttpStatus.OK)
     public ApiResult<?> findAllCelebs(
-            @RequestParam final Long celebId,
-            @RequestParam final String keyword,
+            @RequestParam(required = false) final Long celebId,
+            @RequestParam(required = false) final String keyword,
             @Parameter(hidden = true) @PageableDefault final Pageable pageable
     ){
         final var page = celebService.findAllCeleb(celebId, keyword, pageable);
