@@ -49,4 +49,17 @@ public class PaymentService {
         return iamportResponse;
     }
 
+    @Transactional
+    public void donate(final String email,
+                       final PaymentRequest.DonateDTO dto,
+                       final Long postId) {
+        final Member member = memberRepository.findByEmail(email).orElseThrow(
+                () -> new Exception500("No matched member found")
+        );
+        final Post post = postRepository.findById(postId).orElseThrow(
+                () -> new Exception500("No matched post found")
+        );
+        paymentRepository.save(dto.toEntity(member, post));
+    }
+
 }
