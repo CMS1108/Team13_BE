@@ -25,8 +25,8 @@ import java.io.IOException;
 public class PaymentController {
     private final PaymentService paymentService;
 
-//    @PreAuthorize("hasRole('ROLE_USER')")
-    @PostMapping("/posts/{postId}/donate")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping("/posts/donate/{postId}")
     @ResponseStatus(HttpStatus.OK)
     public ApiResult<?> verifyByImpUidAndDonate(@AuthenticationPrincipal final CustomUserDetails userDetails,
                                              @RequestBody final PaymentRequest.DonateDTO donateDTO,
