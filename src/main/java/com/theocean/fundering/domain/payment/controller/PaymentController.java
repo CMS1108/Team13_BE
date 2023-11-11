@@ -9,6 +9,7 @@ import com.theocean.fundering.domain.payment.service.PaymentService;
 import com.theocean.fundering.global.errors.exception.Exception400;
 import com.theocean.fundering.global.jwt.userInfo.CustomUserDetails;
 import com.theocean.fundering.global.utils.ApiResult;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,12 +26,14 @@ import java.io.IOException;
 public class PaymentController {
     private final PaymentService paymentService;
 
+
+    @Operation(summary = "결제하기", description = "펀딩 id를 기반으로 펀딩에 결제한다.")
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/posts/donate/{postId}")
     @ResponseStatus(HttpStatus.OK)
     public ApiResult<?> verifyByImpUidAndDonate(@AuthenticationPrincipal final CustomUserDetails userDetails,
-                                             @RequestBody final PaymentRequest.DonateDTO donateDTO,
-                                             @PathVariable("postId") final Long postId) {
+                                                @RequestBody final PaymentRequest.DonateDTO donateDTO,
+                                                @PathVariable final Long postId) {
         final String email = userDetails.getEmail();
         paymentService.donate(email, donateDTO, postId);
         return ApiResult.success(null);
