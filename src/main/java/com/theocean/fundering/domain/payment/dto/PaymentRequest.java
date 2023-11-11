@@ -16,12 +16,12 @@ public class PaymentRequest {
     @NoArgsConstructor
     @ToString
     public static class DonateDTO {
-        private int amount;
+        private Integer amount;
         private String impUid;
 
 
         @Builder
-        public DonateDTO(final int amount, final String impUid) {
+        public DonateDTO(final Integer amount, final String impUid) {
             this.amount = amount;
             this.impUid = impUid;
         }

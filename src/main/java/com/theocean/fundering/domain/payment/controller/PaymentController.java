@@ -29,11 +29,11 @@ public class PaymentController {
 
     @Operation(summary = "결제하기", description = "펀딩 id를 기반으로 펀딩에 결제한다.")
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PostMapping("/posts/donate/{postId}")
+    @PostMapping("/posts/{postId}/donate")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResult<?> verifyByImpUidAndDonate(@AuthenticationPrincipal final CustomUserDetails userDetails,
+    public ApiResult<?> donate(@AuthenticationPrincipal final CustomUserDetails userDetails,
                                                 @RequestBody final PaymentRequest.DonateDTO donateDTO,
-                                                @PathVariable final Long postId) {
+                                                @PathVariable("postId") final Long postId) {
         final String email = userDetails.getEmail();
         paymentService.donate(email, donateDTO, postId);
         return ApiResult.success(null);
