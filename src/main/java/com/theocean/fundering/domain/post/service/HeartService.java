@@ -22,6 +22,7 @@ public class HeartService {
         );
         heartRepository.addHeart(memberId, post.getPostId());
         post.addHeartCount();
+
     }
 
     @Transactional
