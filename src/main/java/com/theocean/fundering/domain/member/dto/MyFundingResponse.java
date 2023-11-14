@@ -54,6 +54,7 @@ public class MyFundingResponse {
         private final String thumbnail;
         private final String introduction;
         private final int targetPrice;
+        private final int curretnAmount;
         private final LocalDateTime deadline;
         private final LocalDateTime createdAt;
         private final LocalDateTime modifiedAt;
@@ -71,6 +72,7 @@ public class MyFundingResponse {
         private final String introduction;
         private final int targetPrice;
         private final int paymentAmount;
+        private final int currentAmount;
         private final LocalDateTime deadline;
         private final LocalDateTime createdAt;
         private final LocalDateTime modifiedAt;

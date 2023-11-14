@@ -10,6 +10,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+
+import static com.theocean.fundering.domain.account.domain.QAccount.account;
 import static com.theocean.fundering.domain.payment.domain.QPayment.payment;
 import static com.theocean.fundering.domain.post.domain.QHeart.heart;
 import static com.theocean.fundering.domain.post.domain.QPost.post;
@@ -30,11 +32,13 @@ public class MyFundingRepositoryImpl implements MyFundingRepository{
                                 post.thumbnail,
                                 post.introduction,
                                 post.targetPrice,
+                                account.balance,
                                 post.deadline,
                                 post.modifiedAt,
                                 post.createdAt
                         ))
                         .from(post)
+                        .leftJoin(account).on(account.postId.eq(post.postId))
                         .where(eqPostWriterId(memberId))
                         .offset(pageable.getOffset())
                         .orderBy(post.postId.desc())
@@ -56,12 +60,14 @@ public class MyFundingRepositoryImpl implements MyFundingRepository{
                                 post.introduction,
                                 post.targetPrice,
                                 payment.amount,
+                                account.balance,
                                 post.deadline,
                                 post.modifiedAt,
                                 post.createdAt
                         ))
                         .from(post)
                         .leftJoin(payment).on(payment.memberId.eq(post.postId))
+                        .leftJoin(account).on(account.postId.eq(post.postId))
                         .where(eqPostSupporterId(memberId))
                         .offset(pageable.getOffset())
                         .orderBy(post.postId.desc())
