@@ -17,7 +17,6 @@ public class WithdrawalRequest {
         @NotBlank(message = "계좌번호를 입력해주세요.")
         private String depositAccount;
 
-        @Min(message = "신청 금액은 최소 10000원 이상 입니다.", value = 10000)
         private int amount;
     }
 }
