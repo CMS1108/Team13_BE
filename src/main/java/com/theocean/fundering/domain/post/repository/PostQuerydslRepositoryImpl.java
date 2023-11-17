@@ -116,7 +116,7 @@ public class PostQuerydslRepositoryImpl implements PostQuerydslRepository {
         if ("recent".equals(sort.toString())) {
             specifiers.add(new OrderSpecifier(Order.DESC, post.createdAt));
         } else if ("deadline".equals(sort.toString())) {
-            specifiers.add(new OrderSpecifier(Order.DESC, post.deadline));
+            specifiers.add(new OrderSpecifier(Order.ASC, post.deadline));
         } else if ("amount".equals(sort.toString())) {
             specifiers.add(new OrderSpecifier(Order.DESC, post.account.balance));
         }
