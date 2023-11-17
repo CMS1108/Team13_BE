@@ -105,9 +105,7 @@ public class MyFundingService {
         );
         final int balanceAfterWithdrawal = account.getBalance() - withdrawal.getWithdrawalAmount();
         withdrawal.approveWithdrawal(balanceAfterWithdrawal);
-        withdrawalRepository.save(withdrawal);
         account.updateBalance(balanceAfterWithdrawal);
-        accountRepository.save(account);
     }
 
     @Transactional
